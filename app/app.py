@@ -1,45 +1,53 @@
 from flask import Flask, request
+from flask_smorest import abort
+import uuid
 
 app = Flask(__name__)
 
 stores = [{"name": "My Store", "items": [{"name": "pooop", "price": 15.99}]}]
 
 
-@app.get("/store")
-def get_stores():
-    return {"stores": stores}
 
+### TODO ENDPOINTS ###
+tasks = {
+    "1" : {
+        "id": 1,
+        "description": "voorbeeld taak beschrijving 1",
+        "finished": False
+    },
+    "2" : {
+        "id": 2,
+        "description": "voorbeeld taak beschrijving 2",
+        "finished": False
+    }
+}
 
-@app.post("/store")
-def create_store():
-    request_data = request.get_json()
-    new_store = {"name": request_data["name"], "items": []}
-    stores.append(new_store)
-    return new_store, 201
+# GET all tasks
+@app.get("/tasks")
+def get_tasks():
+    return {"tasks": list(tasks.values())}
 
+# GET task item
+@app.get("/task/<int:task_id>")
+def get_task(task_id):
+    try:
+        return tasks[task_id]
+    except KeyError:
+        abort(404, message="task not found")
 
-@app.post("/store/<string:name>/item")
-def create_item(name):
-    request_data = request.get_json()
-    for store in stores:
-        if store["name"] == name:
-            new_item = {"name": request_data["name"], "price": request_data["price"]}
-            store["items"].append(new_item)
-            return new_item, 201
-    return {"message": "Store not found"}, 404
+# CREATE task item
+@app.post("/task")
+def create_task():
+    task_data = request.get_json()
+    task_id = uuid.uuid4().hex
+    task = {**task_data, "id": task_id, "finished": False}
+    tasks[task_id] = task
+    return task, 201
 
+# UPDATE task item
 
-@app.get("/store/<string:name>")
-def get_store(name):
-    for store in stores:
-        if store["name"] == name:
-            return store
-    return {"message": "Store not found"}, 404
+# DELETE task item
 
+# DELETE list of items
 
-@app.get("/store/<string:name>/item")
-def get_item_in_store(name):
-    for store in stores:
-        if store["name"] == name:
-            return {"items": store["items"]}
-    return {"message": "Store not found"}, 404
+### ACCOUNT ENDPOINTS ###
