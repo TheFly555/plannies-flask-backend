@@ -2,7 +2,7 @@ from flask import Flask, request
 
 app = Flask(__name__)
 
-stores = [{"name": "My Store", "items": [{"name": "pop", "price": 15.99}]}]
+stores = [{"name": "My Store", "items": [{"name": "pooop", "price": 15.99}]}]
 
 
 @app.get("/store")
